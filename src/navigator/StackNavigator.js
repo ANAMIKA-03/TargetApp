@@ -18,13 +18,13 @@ import User from '../screens/Login/User';
 import Pass from '../screens/Login/Pass';
 import InviteF from '../screens/Profile/InviteF';
 import ChangePassword from '../screens/Profile/ChangePassword';
+import ChangeEmail from '../screens/Profile/ChangeEmail';
+import ChangeProfile from '../screens/Profile/ChangeProfile';
 import Help from '../screens/Profile/Help';
 import Faq from '../screens/Profile/Faq';
 import Setting from '../screens/Profile/Setting';
 import LeaderB from '../screens/LeaderB/LeaderB';
 import Profile from '../screens/Profile/Profile';
-
-
 import Home from '../screens/Home/Home';
 import Search from '../screens/Search/Search';
 import SQ from '../screens/Search/SQ';
@@ -236,6 +236,16 @@ export default function StackNavigator() {
         <Stack.Screen
           name="ChangePassword"
           component={ChangePassword}
+          options={{ headerShown: false }} />
+
+        <Stack.Screen
+          name="ChangeEmail"
+          component={ChangeEmail}
+          options={{ headerShown: false }} />
+
+        <Stack.Screen
+          name="ChangeProfile"
+          component={ChangeProfile}
           options={{ headerShown: false }} />
 
         <Stack.Screen

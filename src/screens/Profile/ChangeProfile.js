@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     View, Text, SafeAreaView, StatusBar, KeyboardAvoidingView,
-    TouchableOpacity, TextInput, Modal, StyleSheet, Platform, Alert
+    TouchableOpacity, TextInput, Modal, StyleSheet
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import style from '../../theme/style';
@@ -10,81 +10,52 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import auth from '@react-native-firebase/auth';
 import { AppBar } from '@react-native-material/core';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import DropDownPicker from 'react-native-dropdown-picker';
 
-export default function ChangeEmail() {
+export default function ChangeProfile() {
     const navigation = useNavigation();
     const [modalVisible, setModalVisible] = useState(false);
-    const [currentEmail, setCurrentEmail] = useState('');
-    const [newEmail, setNewEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [currentUsername, setCurrentUsername] = useState('');
+    const [newUsername, setNewUsername] = useState('');
+    const [selectedCountry, setSelectedCountry] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
+    const [open, setOpen] = useState(false);
+    const [items, setItems] = useState([
+        { label: 'United States', value: 'US' },
+        { label: 'India', value: 'IN' },
+        { label: 'Canada', value: 'CA' },
+        { label: 'Australia', value: 'AU' },
+        // Add more countries as needed
+    ]);
 
     useEffect(() => {
-        // Fetch and display the current email address when the component mounts
         const user = auth().currentUser;
-        if (user) {
-            setCurrentEmail(user.email);
+        if (user && user.displayName) {
+            setCurrentUsername(user.displayName);
         }
     }, []);
 
-    // Function to handle reauthentication
-    const reauthenticate = async (password) => {
-        const user = auth().currentUser;
-        const credential = auth.EmailAuthProvider.credential(user.email, password);
-
-        try {
-            await user.reauthenticateWithCredential(credential);
-            console.log('Reauthentication successful');
-            return true;
-        } catch (error) {
-            console.error('Reauthentication failed:', error);
-            if (error.code === 'auth/wrong-password') {
-                setErrorMessage('Incorrect password. Please try again.');
-            } else {
-                setErrorMessage('Failed to reauthenticate. Please try again.');
-            }
-            return false;
-        }
-    };
-
-    // Function to handle email change
-    const handleChangeEmail = async () => {
-        if (!newEmail || !password) {
-            setErrorMessage('Please fill in all fields.');
-            return;
-        }
-
+    const handleChangeProfile = async () => {
         const user = auth().currentUser;
 
-        // Reauthenticate the user before updating the email
-        const reauthenticated = await reauthenticate(password);
-        if (!reauthenticated) return;
-
-        // Update email
         try {
-            await user.updateEmail(newEmail);
-            await user.sendEmailVerification(); // Send verification email to the new email
-            console.log('Email updated successfully');
-            Alert.alert(
-                'Success',
-                'Email updated successfully. A verification email has been sent to your new email address. Please verify it before logging in again.',
-                [{ text: 'OK', onPress: () => setModalVisible(false) }]
-            );
+            // Update the display name (username)
+            await user.updateProfile({
+                displayName: newUsername || currentUsername,
+            });
+
+            // Here you would also save the selected country, potentially to your backend
+            console.log(`Country selected: ${selectedCountry}`);
+
+            console.log('Profile updated successfully');
             setModalVisible(false);
             setErrorMessage('');
-            setNewEmail('');
-            setPassword('');
+            setNewUsername('');
+            alert('Profile updated successfully.');
+
         } catch (error) {
-            console.error('Error updating email:', error);
-            if (error.code === 'auth/email-already-in-use') {
-                setErrorMessage('The new email is already in use by another account.');
-            } else if (error.code === 'auth/invalid-email') {
-                setErrorMessage('The new email address is not valid.');
-            } else if (error.code === 'auth/requires-recent-login') {
-                setErrorMessage('Please reauthenticate and try again.');
-            } else {
-                setErrorMessage('Failed to update email. Please try again.');
-            }
+            console.error('Error updating profile:', error);
+            setErrorMessage('Failed to update profile.');
         }
     };
 
@@ -94,7 +65,7 @@ export default function ChangeEmail() {
             <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : null}>
                 <View style={[style.main, { backgroundColor: Colors.primary, marginTop: Platform.OS === 'ios' ? 10 : 30 }]}>
                     <AppBar
-                        title='Change Email'
+                        title='Change Profile'
                         titleStyle={[style.apptitle, { color: Colors.secondary, marginLeft: 25 }]}
                         centerTitle={true}
                         style={{ backgroundColor: 'transparent' }}
@@ -104,14 +75,14 @@ export default function ChangeEmail() {
                         </TouchableOpacity>}
                     />
                     <View style={{ flex: 1, justifyContent: 'center' }}>
-                        <View style={{ flex: 1, justifyContent: 'flex-end', marginBottom: hp('50%') }}>
-                            <Text style={[style.m18, { color: Colors.txt, textAlign: 'center' }]}>Change your Email below:</Text>
+                        <View style={{ flex: 1, justifyContent: 'flex-end', marginBottom: hp('50%')  }}>
+                            <Text style={[style.m18, { color: Colors.txt, textAlign: 'center' }]}>Change your Profile below:</Text>
 
                             <TouchableOpacity
                                 onPress={() => setModalVisible(true)}
                                 style={[style.btn, { marginTop: 20, backgroundColor: Colors.primary, marginHorizontal: 20, paddingVertical: 15 }]}
                             >
-                                <Text style={[style.m16, { color: Colors.secondary, textAlign: 'center' }]}>Change Email</Text>
+                                <Text style={[style.m16, { color: Colors.secondary, textAlign: 'center' }]}>Change Profile</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -125,37 +96,44 @@ export default function ChangeEmail() {
                 >
                     <View style={styles.modalBackground}>
                         <View style={styles.modalContainer}>
-                            <Text style={[style.m16, { color: Colors.txt, marginBottom: 20 }]}>Change Email</Text>
+                            <Text style={[style.m16, { color: Colors.txt, marginBottom: 20 }]}>Change Profile</Text>
 
                             {errorMessage ? <Text style={{ color: 'red', marginBottom: 10 }}>{errorMessage}</Text> : null}
 
                             <TextInput
-                                placeholder="Current Email"
+                                placeholder="Current Username"
                                 placeholderTextColor={Colors.disable}
-                                value={currentEmail}
+                                value={currentUsername}
                                 editable={false}
                                 style={[styles.input, { backgroundColor: Colors.bg, marginBottom: 15 }]}
                             />
                             <TextInput
-                                placeholder="New Email"
+                                placeholder="New Username"
                                 placeholderTextColor={Colors.disable}
-                                value={newEmail}
-                                onChangeText={setNewEmail}
+                                value={newUsername}
+                                onChangeText={setNewUsername}
                                 style={[styles.input, { backgroundColor: Colors.bg, marginBottom: 15 }]}
                             />
-                            <TextInput
-                                placeholder="Password"
-                                placeholderTextColor={Colors.disable}
-                                secureTextEntry={true}
-                                value={password}
-                                onChangeText={setPassword}
-                                style={[styles.input, { backgroundColor: Colors.bg, marginBottom: 15 }]}
+
+                            <DropDownPicker
+                                open={open}
+                                value={selectedCountry}
+                                items={items}
+                                setOpen={setOpen}
+                                setValue={setSelectedCountry}
+                                setItems={setItems}
+                                placeholder="Select Country"
+                                containerStyle={{ width: '100%', marginBottom: 15 }}
+                                style={{ backgroundColor: Colors.bg }}
+                                dropDownStyle={{ backgroundColor: Colors.bg }}
+                                labelStyle={{ color: Colors.txt }}
                             />
+
                             <TouchableOpacity
-                                onPress={handleChangeEmail}
+                                onPress={handleChangeProfile}
                                 style={[styles.btn, { backgroundColor: Colors.primary, marginTop: 10 }]}
                             >
-                                <Text style={[style.btntxt, { color: Colors.secondary }]}>Change Email</Text>
+                                <Text style={[style.btntxt, { color: Colors.secondary }]}>Save Changes</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => setModalVisible(false)}

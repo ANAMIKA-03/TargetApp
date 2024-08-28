@@ -100,7 +100,9 @@ export default function Setting() {
 
                         <Text style={[style.m14, { color: Colors.disable }]}>ACCOUNT</Text>
 
-                        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.bord, borderRadius: 16, padding: 15, marginTop: 15 }}>
+                        <TouchableOpacity
+                          onPress={() => navigation.navigate('ChangeProfile')}
+                        style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.bord, borderRadius: 16, padding: 15, marginTop: 15 }}>
                             <View style={{ height: 44, width: 44, backgroundColor: Colors.secondary, borderRadius: 22, alignItems: 'center', justifyContent: 'center' }}>
                                 <Icon name='person-outline' size={24} color={Colors.primary}></Icon>
                             </View>
@@ -109,9 +111,12 @@ export default function Setting() {
                                 <Text style={[style.r14, { color: Colors.disable }]}>Update username, country, etc</Text>
                             </View>
                             <Icon name='chevron-forward' size={20} color={Colors.txt}></Icon>
-                        </View>
+                        </TouchableOpacity>
 
-                        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.bord, borderRadius: 16, padding: 15, marginTop: 15 }}>
+                        <TouchableOpacity 
+                         onPress={() => navigation.navigate('ChangeEmail')}
+
+                        style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.bord, borderRadius: 16, padding: 15, marginTop: 15 }}>
                             <View style={{ height: 44, width: 44, backgroundColor: Colors.secondary, borderRadius: 22, alignItems: 'center', justifyContent: 'center' }}>
                                 <Icon name='mail-outline' size={24} color={Colors.primary}></Icon>
                             </View>
@@ -122,7 +127,7 @@ export default function Setting() {
                                 </Text>
                             </View>
                             <Icon name='chevron-forward' size={20} color={Colors.txt}></Icon>
-                        </View>
+                        </TouchableOpacity>
 
                         <TouchableOpacity
                             // onPress={() => setModalVisible(true)} // Open modal on press

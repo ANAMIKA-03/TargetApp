@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     View, Text, SafeAreaView, StatusBar, KeyboardAvoidingView,
-    TouchableOpacity, TextInput, Modal, StyleSheet
+    TouchableOpacity, TextInput, Modal, StyleSheet, Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import style from '../../theme/style';
@@ -21,43 +21,35 @@ export default function ChangePassword() {
     // Function to handle reauthentication
     const reauthenticate = async (currentPassword) => {
         const user = auth().currentUser;
+        const credential = auth.EmailAuthProvider.credential(user.email, currentPassword);
 
-        // Check the sign-in provider (Google, Email/Password, etc.)
-        const provider = user.providerData[0].providerId;
-
-        if (provider === 'password') {
-            // Email/Password reauthentication
-            const credential = auth.EmailAuthProvider.credential(user.email, currentPassword);
-            try {
-                await user.reauthenticateWithCredential(credential);
-                console.log('Reauthentication successful');
-                return true;
-            } catch (error) {
-                console.error('Reauthentication failed', error);
+        try {
+            await user.reauthenticateWithCredential(credential);
+            console.log('Reauthentication successful');
+            return true;
+        } catch (error) {
+            console.error('Reauthentication failed', error);
+            if (error.code === 'auth/wrong-password') {
                 setErrorMessage('Current password is incorrect.');
-                return false;
+            } else {
+                setErrorMessage('Failed to reauthenticate. Please try again.');
             }
-        } else if (provider === 'google.com') {
-            // Google reauthentication
-            try {
-                const { idToken } = await GoogleSignin.signIn();
-                const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-                await user.reauthenticateWithCredential(googleCredential);
-                console.log('Reauthentication successful');
-                return true;
-            } catch (error) {
-                console.error('Reauthentication with Google failed', error);
-                setErrorMessage('Reauthentication failed. Please try again.');
-                return false;
-            }
-        } else {
-            setErrorMessage('Unsupported authentication provider.');
             return false;
         }
     };
 
     // Function to handle password change
     const handleChangePassword = async () => {
+        if (!currentPassword || !newPassword) {
+            setErrorMessage('Please fill in all fields.');
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            setErrorMessage('New password should be at least 6 characters long.');
+            return;
+        }
+
         const reauthenticated = await reauthenticate(currentPassword);
         if (reauthenticated) {
             const user = auth().currentUser;
@@ -68,10 +60,11 @@ export default function ChangePassword() {
                     setErrorMessage('');
                     setCurrentPassword('');
                     setNewPassword('');
+                    alert('Password changed successfully');
                 })
                 .catch(error => {
                     console.error('Error updating password', error);
-                    setErrorMessage('Failed to update password.');
+                    setErrorMessage('Failed to update password. Please try again.');
                 });
         }
     };
@@ -92,16 +85,16 @@ export default function ChangePassword() {
                         </TouchableOpacity>}
                     />
                     <View style={{ flex: 1, justifyContent: 'center' }}>
-                            <View style={{ flex: 1, justifyContent: 'flex-end', marginBottom: hp('50%')  }}>
-                                <Text style={[style.m18, { color: Colors.txt, textAlign: 'center' }]}>Change your password below:</Text>
+                        <View style={{ flex: 1, justifyContent: 'flex-end', marginBottom: hp('50%') }}>
+                            <Text style={[style.m18, { color: Colors.txt, textAlign: 'center' }]}>Change your password below:</Text>
 
-                                <TouchableOpacity
-                                    onPress={() => setModalVisible(true)}
-                                    style={[style.btn, { marginTop: 20, backgroundColor: Colors.primary, marginHorizontal: 20, paddingVertical: 15 }]}
-                                >
-                                    <Text style={[style.m16, { color: Colors.secondary, textAlign: 'center' }]}>Change Password</Text>
-                                </TouchableOpacity>
-                            </View>
+                            <TouchableOpacity
+                                onPress={() => setModalVisible(true)}
+                                style={[style.btn, { marginTop: 20, backgroundColor: Colors.primary, marginHorizontal: 20, paddingVertical: 15 }]}
+                            >
+                                <Text style={[style.m16, { color: Colors.secondary, textAlign: 'center' }]}>Change Password</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
 
@@ -114,7 +107,7 @@ export default function ChangePassword() {
                     <View style={styles.modalBackground}>
                         <View style={styles.modalContainer}>
                             <Text style={[style.m16, { color: Colors.txt, marginBottom: 20 }]}>Change Password</Text>
-                            
+
                             {errorMessage ? <Text style={{ color: 'red', marginBottom: 10 }}>{errorMessage}</Text> : null}
 
                             <TextInput
