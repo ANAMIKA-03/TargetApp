@@ -20,14 +20,12 @@ export default function ChangeEmail() {
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
-        // Fetch and display the current email address when the component mounts
         const user = auth().currentUser;
         if (user) {
             setCurrentEmail(user.email);
         }
     }, []);
 
-    // Function to handle reauthentication
     const reauthenticate = async (password) => {
         const user = auth().currentUser;
         const credential = auth.EmailAuthProvider.credential(user.email, password);
@@ -47,7 +45,6 @@ export default function ChangeEmail() {
         }
     };
 
-    // Function to handle email change
     const handleChangeEmail = async () => {
         if (!newEmail || !password) {
             setErrorMessage('Please fill in all fields.');
@@ -56,14 +53,12 @@ export default function ChangeEmail() {
 
         const user = auth().currentUser;
 
-        // Reauthenticate the user before updating the email
         const reauthenticated = await reauthenticate(password);
         if (!reauthenticated) return;
 
-        // Update email
         try {
             await user.updateEmail(newEmail);
-            await user.sendEmailVerification(); // Send verification email to the new email
+            await user.sendEmailVerification(); 
             console.log('Email updated successfully');
             Alert.alert(
                 'Success',
