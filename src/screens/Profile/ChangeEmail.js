@@ -10,6 +10,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import auth from '@react-native-firebase/auth';
 import { AppBar } from '@react-native-material/core';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import firestore from '@react-native-firebase/firestore';
 
 export default function ChangeEmail() {
     const navigation = useNavigation();
@@ -45,43 +46,69 @@ export default function ChangeEmail() {
         }
     };
 
+
     const handleChangeEmail = async () => {
-        if (!newEmail || !password) {
+        setErrorMessage(''); 
+
+        if (!currentEmail || !newEmail || !password) {
             setErrorMessage('Please fill in all fields.');
             return;
         }
 
         const user = auth().currentUser;
 
-        const reauthenticated = await reauthenticate(password);
-        if (!reauthenticated) return;
+        if (!user) {
+            setErrorMessage('No user is currently signed in.');
+            return;
+        }
 
         try {
-            await user.updateEmail(newEmail);
-            await user.sendEmailVerification(); 
-            console.log('Email updated successfully');
+            const reauthenticated = await reauthenticate(password);
+            if (!reauthenticated) {
+                console.log('Reauthentication failed, cannot proceed to update email.');
+                return;
+            }
+
+            await firestore().collection('emailChanges').add({
+                userId: user.uid,
+                currentEmail: currentEmail,
+                newEmail: newEmail,
+                timestamp: firestore.FieldValue.serverTimestamp(),
+            });
+
             Alert.alert(
-                'Success',
-                'Email updated successfully. A verification email has been sent to your new email address. Please verify it before logging in again.',
+                'Request Submitted',
+                'Your email change request has been submitted. Please verify the new email before proceeding with the change.',
                 [{ text: 'OK', onPress: () => setModalVisible(false) }]
             );
+
             setModalVisible(false);
             setErrorMessage('');
             setNewEmail('');
             setPassword('');
         } catch (error) {
-            console.error('Error updating email:', error);
-            if (error.code === 'auth/email-already-in-use') {
-                setErrorMessage('The new email is already in use by another account.');
-            } else if (error.code === 'auth/invalid-email') {
-                setErrorMessage('The new email address is not valid.');
-            } else if (error.code === 'auth/requires-recent-login') {
-                setErrorMessage('Please reauthenticate and try again.');
-            } else {
-                setErrorMessage('Failed to update email. Please try again.');
+            console.error('Error submitting email change request:', error);
+
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    setErrorMessage('The new email is already in use by another account.');
+                    break;
+                case 'auth/invalid-email':
+                    setErrorMessage('The new email address is not valid.');
+                    break;
+                case 'auth/requires-recent-login':
+                    setErrorMessage('Please reauthenticate and try again.');
+                    break;
+                case 'auth/network-request-failed':
+                    setErrorMessage('Network error. Please check your connection and try again.');
+                    break;
+                default:
+                    setErrorMessage('Failed to submit email change request. Please try again.');
             }
         }
     };
+
+    
 
     return (
         <SafeAreaView style={[style.area, { backgroundColor: Colors.primary }]}>
