@@ -48,7 +48,7 @@ export default function ChangeEmail() {
 
 
     const handleChangeEmail = async () => {
-        setErrorMessage(''); 
+        setErrorMessage('');
 
         if (!currentEmail || !newEmail || !password) {
             setErrorMessage('Please fill in all fields.');
@@ -76,6 +76,13 @@ export default function ChangeEmail() {
                 timestamp: firestore.FieldValue.serverTimestamp(),
             });
 
+            await user.updateEmail(newEmail);
+            console.log(`Email updated to: ${newEmail}`);
+
+            await user.sendEmailVerification();
+            console.log('Verification email sent to the new email address.');
+
+            setCurrentEmail(newEmail);
             Alert.alert(
                 'Request Submitted',
                 'Your email change request has been submitted. Please verify the new email before proceeding with the change.',
@@ -108,7 +115,7 @@ export default function ChangeEmail() {
         }
     };
 
-    
+
 
     return (
         <SafeAreaView style={[style.area, { backgroundColor: Colors.primary }]}>

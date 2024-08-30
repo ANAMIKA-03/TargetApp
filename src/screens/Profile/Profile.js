@@ -1,5 +1,5 @@
 import { View, Text, FlatList, SafeAreaView, Dimensions, StatusBar, KeyboardAvoidingView, ImageBackground, TouchableOpacity, Image, ScrollView, TextInput, Switch, StyleSheet } from 'react-native'
-import React, { useState, useContext, } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import style from '../../theme/style'
 import { Colors } from '../../theme/color'
@@ -8,6 +8,7 @@ import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Avatar } from 'react-native-paper'
 import { AppBar } from '@react-native-material/core';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import auth from '@react-native-firebase/auth';
 
 const width = Dimensions.get('screen').width
 const height = Dimensions.get('screen').height
@@ -216,6 +217,16 @@ const Details = () => {
 
 export default function Profile() {
     const navigation = useNavigation();
+    const [displayName, setDisplayName] = useState(''); // State to store the display name
+
+    useEffect(() => {
+        const user = auth().currentUser; 
+        if (user && user.displayName) {
+            setDisplayName(user.displayName); 
+        } else {
+            setDisplayName('User'); 
+        }
+    }, []);
     return (
         <SafeAreaView style={[style.area, { backgroundColor: Colors.primary }]}>
             <StatusBar backgroundColor='transparent' translucent={true} barStyle={'dark-content'} />
@@ -233,7 +244,7 @@ export default function Profile() {
 
                     <Image source={require('../../../assets/image/a18.png')} resizeMode='stretch' style={{ height: 100, width: 100, alignSelf: 'center', marginTop: -50 }}></Image>
 
-                    <Text style={[style.apptitle, { color: Colors.txt, textAlign: 'center', marginTop: 4 }]}>Madelyn Dias</Text>
+                    <Text style={[style.apptitle, { color: Colors.txt, textAlign: 'center', marginTop: 4 }]}>{displayName}</Text>
 
                     <View style={{marginTop: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', backgroundColor: Colors.primary, borderRadius: 20, paddingVertical: 15 }}>
 
