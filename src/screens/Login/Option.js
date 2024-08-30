@@ -15,7 +15,7 @@ export default function Option() {
     const navigation = useNavigation();
     return (
         <SafeAreaView style={[style.area, { backgroundColor: Colors.bord }]}>
-            <ImageBackground source={require('../../../assets/image/a1.png')} resizeMode='stretch' style={{ flex: 1 }}>
+            <ImageBackground source={require('../../../assets/image/T100.png')} resizeMode='stretch' style={{ flex: 1 }}>
                 <StatusBar backgroundColor='transparent' translucent={true} barStyle={'dark-content'} />
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : null}>
 

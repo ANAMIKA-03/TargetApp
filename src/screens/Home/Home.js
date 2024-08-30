@@ -1,17 +1,28 @@
 import { View, Text, SafeAreaView, TextInput, Dimensions, ImageBackground, StatusBar, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView } from 'react-native'
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect} from 'react'
 import style from '../../theme/style';
 import { Colors } from '../../theme/color';
 import { useNavigation } from '@react-navigation/native';
 import { AppBar } from '@react-native-material/core';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
+import auth from '@react-native-firebase/auth';
 
 const width = Dimensions.get('screen').width
 const height = Dimensions.get('screen').height
 
 export default function Home() {
     const navigation = useNavigation();
+    const [displayName, setDisplayName] = useState(''); // State to store the display name
+
+    useEffect(() => {
+        const user = auth().currentUser; // Get the current authenticated user
+        if (user && user.displayName) {
+            setDisplayName(user.displayName); // Set the display name from the user object
+        } else {
+            setDisplayName('User'); // Fallback in case displayName is not available
+        }
+    }, []);
     return (
         <SafeAreaView style={[style.area, { backgroundColor: Colors.primary, }]}>
             <StatusBar translucent={true} backgroundColor={'transparent'} barStyle={'light-content'} />
@@ -22,7 +33,8 @@ export default function Home() {
                         <Icon name='sunny-outline' size={20} color={Colors.lpink} />
                         <Text style={[style.m12, { color: Colors.lpink, marginLeft: 5 }]}>GOOD MORNING</Text>
                     </View>
-                    <Text style={[style.apptitle, { color: Colors.secondary, }]}>Madelyn Dias</Text>
+
+                    <Text style={[style.apptitle, { color: Colors.secondary, }]}>{displayName}</Text>
                 </View>
                 <Image source={require('../../../assets/image/s1.png')} resizeMode='stretch' style={{ height: 56, width: 56 }} />
             </View>
