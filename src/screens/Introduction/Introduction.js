@@ -35,13 +35,13 @@ export default function Introduction() {
                         <View style={{ flex: 0.4, backgroundColor: Colors.bg, margin: 20, borderRadius: 15, padding: 15 }}>
                             <Text style={[style.apptitle, { color: Colors.active, textAlign: 'center' }]}>Create gamified quizzes becomes simple</Text>
 
-                            <TouchableOpacity onPress={() => navigation.navigate('Option')}
+                            <TouchableOpacity onPress={() => navigation.navigate('Signup')}
                                 style={[style.btn, { marginVertical: 20 }]}>
                                 <Text style={[style.btntxt, {}]}>Sign Up</Text>
                             </TouchableOpacity>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', }}>
                                 <Text style={[style.r16, { color: Colors.disable, }]}>Already have an account?</Text>
-                                <TouchableOpacity onPress={() => navigation.navigate('Option')}>
+                                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                                     <Text style={[style.m16, { color: Colors.primary, }]}> Login</Text>
                                 </TouchableOpacity>
                             </View>
@@ -67,13 +67,13 @@ export default function Introduction() {
                         <View style={{ flex: 0.4, backgroundColor: Colors.bg, margin: 20, borderRadius: 15, padding: 15 }}>
                             <Text style={[style.apptitle, { color: Colors.active, textAlign: 'center' }]}>Find quizzes to test out your knowledge</Text>
 
-                            <TouchableOpacity onPress={() => navigation.navigate('Option')}
+                            <TouchableOpacity onPress={() => navigation.navigate('Signup')}
                                 style={[style.btn, { marginVertical: 20 }]}>
                                 <Text style={[style.btntxt, {}]}>Sign Up</Text>
                             </TouchableOpacity>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', }}>
                                 <Text style={[style.r16, { color: Colors.disable, }]}>Already have an account?</Text>
-                                <TouchableOpacity onPress={() => navigation.navigate('Option')}>
+                                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                                     <Text style={[style.m16, { color: Colors.primary, }]}> Login</Text>
                                 </TouchableOpacity>
                             </View>
@@ -99,13 +99,13 @@ export default function Introduction() {
                         <View style={{ flex: 0.4, backgroundColor: Colors.bg, margin: 20, borderRadius: 15, padding: 15 }}>
                             <Text style={[style.apptitle, { color: Colors.active, textAlign: 'center' }]}>Take part in challenges with friends</Text>
 
-                            <TouchableOpacity onPress={() => navigation.navigate('Option')}
+                            <TouchableOpacity onPress={() => navigation.navigate('Signup')}
                                 style={[style.btn, { marginVertical: 20 }]}>
                                 <Text style={[style.btntxt, {}]}>Sign Up</Text>
                             </TouchableOpacity>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', }}>
                                 <Text style={[style.r16, { color: Colors.disable, }]}>Already have an account?</Text>
-                                <TouchableOpacity onPress={() => navigation.navigate('Option')}>
+                                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                                     <Text style={[style.m16, { color: Colors.primary, }]}> Login</Text>
                                 </TouchableOpacity>
                             </View>

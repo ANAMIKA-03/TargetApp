@@ -44,30 +44,56 @@ export default function ChangePassword() {
             setErrorMessage('Please fill in all fields.');
             return;
         }
-
+    
         if (newPassword.length < 6) {
             setErrorMessage('New password should be at least 6 characters long.');
             return;
         }
-
+    
         const reauthenticated = await reauthenticate(currentPassword);
         if (reauthenticated) {
             const user = auth().currentUser;
             user.updatePassword(newPassword)
-                .then(() => {
-                    console.log('Password updated successfully');
-                    setModalVisible(false);
-                    setErrorMessage('');
-                    setCurrentPassword('');
-                    setNewPassword('');
-                    alert('Password changed successfully');
+                .then(async () => {
+                    console.log('Password updated successfully in Firebase Auth');
+    
+                    // Now update the password in Firestore
+                    try {
+                        const userDoc = await firestore()
+                            .collection('registerUser')
+                            .where('email', '==', user.email)
+                            .limit(1)
+                            .get();
+    
+                        if (!userDoc.empty) {
+                            const docId = userDoc.docs[0].id;
+                            await firestore()
+                                .collection('registerUser')
+                                .doc(docId)
+                                .update({ password: newPassword });
+    
+                            console.log('Password updated successfully in Firestore');
+                            setModalVisible(false);
+                            setErrorMessage('');
+                            setCurrentPassword('');
+                            setNewPassword('');
+                            alert('Password changed successfully');
+                        } else {
+                            console.error('No document found with the current email.');
+                            setErrorMessage('Failed to update password in Firestore.');
+                        }
+                    } catch (firestoreError) {
+                        console.error('Error updating password in Firestore', firestoreError);
+                        setErrorMessage('Failed to update password in Firestore. Please try again.');
+                    }
                 })
                 .catch(error => {
-                    console.error('Error updating password', error);
+                    console.error('Error updating password in Firebase Auth', error);
                     setErrorMessage('Failed to update password. Please try again.');
                 });
         }
     };
+    
 
     return (
         <SafeAreaView style={[style.area, { backgroundColor: Colors.primary }]}>
